@@ -1,0 +1,11 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: java-service-configmap
+data:
+  application-kubernetes.yaml: |
+    hello-service:
+      url: https://hello:8080
+    spring:
+      jpa:
+        database-platform: org.hibernate.dialect.MySQL8Dialect
