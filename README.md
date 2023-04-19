@@ -77,6 +77,11 @@ You can find out which port was chosen with Lens or
 ```bash
 kubectl get service
 ```
+> **Side note:** Each k8s resource has a long and a short name. svc is the shortname for service, so 
+> ```bash
+> kubectl get svc
+> ```
+> is exactly the same
 
 now your browser should say Hello when you go to http://localhost:<port>/hello
 
@@ -119,3 +124,25 @@ When the new pod (with v2 of your app) is running the service will start routing
 This strategy obviously requires the 2 version of the app to be compatible for your users/consumers.
 If you cant have 2 versions running at the same time, use the **Recreate** strategy. Pods will be first all killed, and only recreated afterwards and you have a short downtime
 
+### Step 3 : LoadBalancer: expose the service to the outside world.
+With the **Nodeport** we have to know which port was opened by the cluster and on which node in the cluster to access it from outside. 
+We can change the type to **LoadBalancer** to bind the service to the default load balancer provided by your k8s provider (if they provide one).
+
+Let's do this:
+* Update the service type in service.yml to LoadBalancer
+* deploy the change with:
+
+```bash
+kubectl apply -f ./pod/deployment/service.yml
+```
+Check the result in Lens or with
+```bash
+kubectl set svc
+```
+It may take a while, depending on the provider. LoadBalancers are created asynchronously. 
+When done, you will see now that the service will be exposed on an **external** address.
+We can now use are browser to see Hello on the external address.
+
+> On docker-desktop the external address is localhost, on AWS it will be some generated .awsservices.com address.
+
+See on my machine http://localhost/hello works, if port 80 is not in use yet :)
