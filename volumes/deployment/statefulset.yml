@@ -1,0 +1,29 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  labels:
+    app: stateful-java-service
+  name: stateful-java-service
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: stateful-java-service
+  serviceName: stateful-java-service
+  template:
+    metadata:
+      labels:
+        app: stateful-java-service
+    spec:
+      containers:
+        - name: stateful-java-service
+          image: javaguildkubernetes/java-service:volumes
+          imagePullPolicy: IfNotPresent
+          volumeMounts:
+            - mountPath: /data
+              name: data
+      serviceAccountName: default
+      volumes:
+        - name: data
+          persistentVolumeClaim:
+            claimName: stateful-java-service-data
