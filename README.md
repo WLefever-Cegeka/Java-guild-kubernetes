@@ -29,12 +29,93 @@ Kubernetes assigns to each pod an ip address which becomes unavailable when the 
 
 Run the following command to create a docker image with name ``:
 ```
-mvn clean compile jib:dockerBuild
+mvn clean compile jib:build
 ```
 
 [//]: # (mvn clean compile jib:build is used to push to a registry)
 
-Apply the deployment file:
+Verify you are connected to the kubernetes cluster you intend to use with
+```bash
+kubectl config current-context
 ```
+
+Apply the deployment file:
+```bash
 kubectl apply -f ./pod/deployment/deployment.yml
 ```
+
+### Step 2: Service
+
+We add a simple Spring RestController so that our mini app has something to respond to: see HelloService.java
+
+to provide network access to the pod(s) that will expose the /hello endpoint, we create a service with
+
+```bash
+kubectl apply -f ./pod/deployment/service.yml
+```
+
+This service will forward traffic to one of the pods that have a matching label selector. Note this part in the service.yml
+
+```yaml
+selector:
+    app: java-service
+```
+
+which matches this part in the deployment.yml:
+
+```yaml
+labels:
+  app: java-service
+```
+
+#### Let's test the service
+
+We used the NodePort type of service.
+This means that k8s will look for an available port on the host machine and bind the service to that port.
+You can find out which port was chosen with Lens or 
+
+```bash
+kubectl get service
+```
+
+now your browser should say Hello when you go to http://localhost:<port>/hello
+
+Services are also exposed to the local k8s dns in this format (this is sometime slightly different depending on your provider):
+
+```
+<service name>.<namespace>.svc.cluster.local
+```
+
+So in our example from inside the cluster this address should say Hello:
+> http://java-service.default.svc.cluster.local/hello
+
+Now how do you get *inside* the cluster?
+We need a pod that has curl. Easy-peasy: just deploy&run one with this command:
+
+```bash
+kubectl run curltest --image=curlimages/curl -i --tty -- sh
+```
+
+Now you can test the local url of the service with
+
+```bash
+curl http://java-service.default.svc.cluster.local/hello
+```
+
+#### What is this service thing actually doing?
+
+When deploying multiple replicas of the pod, the service will start distributing the traffic over the available pods.
+Also when updating the application, you deploy a new version of the pod without downtime:
+The default **Strategy Type** for Deployments is **RollingUpdate**. You can verify this with Lens or with 
+
+```bash
+kubectl get deployments -o yaml
+```
+
+This means that k8s will make sure that at all times at least the number of desired replicas are available.
+So with 1 desired replica, first a new pod will be added with the new version of the app. 
+When the new pod (with v2 of your app) is running the service will start routing traffic to the new pod and k8s can now start removing the old pod
+
+This strategy obviously requires the 2 version of the app to be compatible for your users/consumers.
+If you cant have 2 versions running at the same time, use the **Recreate** strategy. Pods will be first all killed, and only recreated afterwards and you have a short downtime
+

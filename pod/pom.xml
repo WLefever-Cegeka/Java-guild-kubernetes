@@ -13,7 +13,7 @@
 
     <properties>
         <sprint-boot.version>2.7.10</sprint-boot.version>
-        <image.tag>1</image.tag>
+        <image.tag>2</image.tag>
     </properties>
 
     <dependencies>
