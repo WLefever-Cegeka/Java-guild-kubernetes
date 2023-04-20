@@ -145,4 +145,37 @@ We can now use are browser to see Hello on the external address.
 
 > On docker-desktop the external address is localhost, on AWS it will be some generated .awsservices.com address.
 
-See on my machine http://localhost/hello works, if port 80 is not in use yet :)
+On my machine http://localhost/hello works, if port 80 is not in use yet :)
+
+
+### Step 4: Ingress Controllers
+If you want more control over routing and/or more features like SSL termination, sticky sessions,... you can add an Ingress controller.
+
+> On local environments like minikube or docker-desktop, you will have to set up ingress support first.
+> See https://kubernetes.github.io/ingress-nginx/deploy for instructions 
+
+Let's add an Ingress controller:
+
+```bash
+kubectl apply -f ingress/ingress.yml
+```
+This will bind the service to an external dns name **hello.localdev.me**
+We can test it: http://hello.localdev.me/hello
+
+#### AWS example
+On AWS the Ingress controller will control an ALB or ELB Loadbalancer. To tweak the behaviour, annotations are used like this for ALB:
+(taken from a real world example)
+
+```yaml
+metadata:
+  name: my-ingress-on-aws
+  annotations:
+    alb.ingress.kubernetes.io/certificate-arn: arn:aws:acm:eu-central-1:125617825810:certificate/f99cca0d-1a50-443a-b266-da98aaabb4c1
+    alb.ingress.kubernetes.io/listen-ports: '[{"HTTP": 80},{"HTTPS":443}]'
+    alb.ingress.kubernetes.io/actions.ssl-redirect: '{"Type": "redirect", "RedirectConfig":{ "Protocol": "HTTPS", "Port": "443", "StatusCode": "HTTP_301"}}'
+    alb.ingress.kubernetes.io/scheme: internet-facing
+    alb.ingress.kubernetes.io/healthcheck-path: /actuator/health/readiness
+    external-dns.alpha.kubernetes.io/hostname: my-app.com
+    alb.ingress.kubernetes.io/group.name: "company-global-loadbalancer"
+    kubernetes.io/ingress.class: alb
+``
