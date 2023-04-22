@@ -16,6 +16,8 @@
     <modules>
         <module>pod</module>
         <module>networking</module>
+        <module>configmap</module>
+        <module>volumes</module>
     </modules>
     <packaging>pom</packaging>
 
