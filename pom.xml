@@ -7,8 +7,15 @@
     <groupId>org.example</groupId>
     <artifactId>java-guild-kubernetes</artifactId>
     <version>1.0-SNAPSHOT</version>
+    <parent>
+        <groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-starter-parent</artifactId>
+        <version>2.7.11</version>
+        <relativePath/> <!-- lookup parent from repository -->
+    </parent>
     <modules>
         <module>pod</module>
+        <module>networking</module>
     </modules>
     <packaging>pom</packaging>
 

@@ -5,8 +5,8 @@ metadata:
 spec:
   selector:
     app: java-service
-  type: NodePort
+  type: LoadBalancer
   ports:
     - protocol: TCP
-      port: 80
+      port: 8888
       targetPort: 8080
