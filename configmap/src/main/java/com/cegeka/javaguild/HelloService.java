@@ -11,8 +11,8 @@ public class HelloService {
     private final String helloServiceApiKey;
 
     public HelloService(
-            @Value("hello-service.url") String helloServiceUrl,
-            @Value("hello-service.api-key") String helloServiceApiKey
+            @Value("${hello-service.url}") String helloServiceUrl,
+            @Value("${hello-service.api-key}") String helloServiceApiKey
     ) {
         this.helloServiceUrl = helloServiceUrl;
         this.helloServiceApiKey = helloServiceApiKey;
