@@ -22,7 +22,8 @@ spec:
             - containerPort: 8080
           volumeMounts:
             - name: my-config
-              mountPath: /app/resources
+              mountPath: /app/resources/application-kubernetes.yaml
+              subPath: application-kubernetes.yaml
           env:
             - name: SPRING_PROFILES_ACTIVE
               value: kubernetes

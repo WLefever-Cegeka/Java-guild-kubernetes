@@ -1,0 +1,3 @@
+hello-service:
+  url: "http://localhost:80/hello"
+  api-key: "EMPTY"

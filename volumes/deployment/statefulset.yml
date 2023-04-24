@@ -18,12 +18,17 @@ spec:
       containers:
         - name: stateful-java-service
           image: javaguildkubernetes/java-service:volumes
-          imagePullPolicy: IfNotPresent
+          imagePullPolicy: Always
           volumeMounts:
             - mountPath: /data
               name: data
       serviceAccountName: default
-      volumes:
-        - name: data
-          persistentVolumeClaim:
-            claimName: stateful-java-service-data
+  volumeClaimTemplates:
+    - metadata:
+        name: data
+      spec:
+        accessModes:
+          - ReadWriteOnce
+        resources:
+          requests:
+            storage: 64Mi
