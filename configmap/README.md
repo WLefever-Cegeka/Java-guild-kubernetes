@@ -1,41 +1,62 @@
 # Configuration
 
-Not everything that is required to run our java application is typically going to be included in our jar artifact.
-There's usually all kinds of configuration which we want to separate from the application,
-because for instance we might want to run multiple instances with different configuration.
+Most applications do not consist of only code but also need configuration. 
+And that configuration is typically not  included in the deployment artifact. 
+It is a best practice to separate configuration from the application because for instance 
+we might want to run multiple instances with a different configuration.
 
-This is one of the factors of 12factor apps. https://12factor.net/
+This is one of the factors of 12factor apps. https://12factor.net/ 
+12factor is a document containing best practices for building software-as-a-service applications 
+focusing on declarative formats, clean contracts and suitability to deploy on modern environments.
 
-SHOW: application
+
+
+#### SHOW: Application.java/HelloService.java
+
+Here's our application, just another spring boot application. 
+It has a service that makes use of configuration to specify an *external url* and 
+also an *api key*.
+
+This configuration needs to be provided somehow and in kubernetes this is done 
+using **ConfigMaps** and/or **Secrets**.
+
+
 
 ## ConfigMap
 
-A **ConfigMap** is a kubernetes resource used to store non-confidential data in key-value pairs. 
-Pods can consume ConfigMaps as environment variables or as files in a volume.
+A **ConfigMap** is a kubernetes resource used to store non-confidential data in key-value pairs.
+Pods can consume ConfigMaps as either environment variables or as files in a volume.
 
-A **ConfigMap** allows you to decouple environment-specific configuration from your container images, so that your applications are easily portable.
-For example, you could add the hostnames or URLs of external services to a configmap so that in development you can talk 
-to the development environment of the external service or even your own stubs, while in production you want to communicate with the real service.
+A **ConfigMap** allows you to decouple your configuration from your container images, so that your applications are easily portable.
 
-SHOW: configmap yaml
 
-Our ConfigMap contains one key-value pair: application-kubernetes.yaml with as value spring application properties in yaml format. 
-We can then mount this as a file in our deployment after which our spring boot application can pick it up and load it in if the *kubernetes* profile is enabled.
 
-Another way to configure spring properties via the ConfigMap would be using them as environment variables.
-For example to set the `spring.jpa.database-platform: org.hibernate.dialect.MySQL8Dialect`, we could add following key-value pair:
+#### SHOW: configmap.yml
+
+So here we have our configmap, it has a name and contains one key-value pair: 
+application-kubernetes.yaml with as value the spring application properties for our application in yaml format.
+
+We can then mount this as a file in our deployment as we'll see later after which 
+our spring boot application can pick it up and load it in if the *kubernetes* profile 
+is enabled.
+
+Another way to configure these properties via the ConfigMap would be using them as environment variables.
+
+For example to set the `spring.jpa.database-platform: org.hibernate.dialect.MySQL8Dialect`, 
+we could add following key-value pair:
 
 ```yaml
 SPRING_JPA_DATABASEPLATFORM: org.hibernate.dialect.MySQL8Dialect
 ```
 
-Note: the dash in database-platform is not there anymore, as environment variables do not support this. 
-This however still works and is an example of **relaxed binding** in spring boot. 
+Note: the dash in database-platform is not there anymore, as environment variables do not support this.
+This however still works and is an example of **relaxed binding** in spring boot.
 https://docs.spring.io/spring-boot/docs/2.0.x/reference/html/boot-features-external-config.html#boot-features-external-config-relaxed-binding
 
 ### Using ConfigMaps
 
 #### Mounting all the keys in the configmap as a file in a directory */app/resources*:
+
 ```yaml
 apiVersion: apps/v1
 kind: Deployment
@@ -61,6 +82,7 @@ spec:
 ```
 
 #### Mounting a specific key in the configmap as a file:
+
 ```yaml
 apiVersion: apps/v1
 kind: Deployment
@@ -87,6 +109,7 @@ spec:
 ```
 
 #### Mounting all the keys in the configmap as environment variables:
+
 ```yaml
 apiVersion: apps/v1
 kind: Deployment
@@ -108,6 +131,7 @@ spec:
 
 
 #### Mounting a specific key in the configmap as an environment variable:
+
 ```yaml
 apiVersion: apps/v1
 kind: Deployment
@@ -147,12 +171,19 @@ Note: ConfigMaps can also contain binary data since kubernetes 1.10 by adding th
 It is up to the kubernetes cluster administrators to secure access to Secrets by encrypting them at rest
 and configuring RBAC (not everyone with access to the cluster can access all resources).
 
-SHOW: secret yaml
+
+
+#### SHOW: secret.yml
+
+Here we have a secret containing 1 key-value pair and as you see the value is specified as base64.
+
+
 
 ### Using Secrets
 
 
 #### Mounting all the keys in the secret as a file in a directory */app/resources*:
+
 ```yaml
 apiVersion: apps/v1
 kind: Deployment
@@ -178,6 +209,7 @@ spec:
 ```
 
 #### Mounting a specific key in the secret as a file:
+
 ```yaml
 apiVersion: apps/v1
 kind: Deployment
@@ -204,6 +236,7 @@ spec:
 ```
 
 #### Mounting all the keys in the secret as environment variables:
+
 ```yaml
 apiVersion: apps/v1
 kind: Deployment
@@ -225,6 +258,7 @@ spec:
 
 
 #### Mounting a specific key in the secret as an environment variable:
+
 ```yaml
 apiVersion: apps/v1
 kind: Deployment
@@ -248,10 +282,12 @@ spec:
                   key: USERSERVICE_APIKEY
 ```
 
-SHOW: deployment.yaml
+#### SHOW: deployment.yaml
 
 ```bash
 kubectl apply -f ./configmap/deployment
 ```
 
-SHOW: demo
+We'll apply this to the cluster. We see a pod is created, I will port-forward the server port to my local port to call the rest endpoint to proof that the configuration from the ConfigMap and Secret is used.
+
+`http://localhost:8080/hello`
