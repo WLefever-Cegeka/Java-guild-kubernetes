@@ -4,6 +4,7 @@ metadata:
   name: java-service-deployment
   labels:
     app: java-service
+    demo: networking
 spec:
   replicas: 1
   selector:
