@@ -1,0 +1,61 @@
+kind: Namespace
+apiVersion: v1
+metadata:
+  name: development
+  labels:
+    name: development
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: java-service-development
+  namespace: development
+  labels:
+    app: java-service
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: java-service
+  template:
+    metadata:
+      labels:
+        app: java-service
+    spec:
+      containers:
+        - name: java-service
+          image: javaguildkubernetes/java-service:pod
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 80
+---
+kind: Namespace
+apiVersion: v1
+metadata:
+  name: acceptance
+  labels:
+    name: development
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: java-service-acceptance
+  namespace: acceptance
+  labels:
+    app: java-service
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: java-service
+  template:
+    metadata:
+      labels:
+        app: java-service
+    spec:
+      containers:
+        - name: java-service
+          image: javaguildkubernetes/java-service:pod
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 80
