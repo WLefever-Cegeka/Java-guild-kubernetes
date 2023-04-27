@@ -18,6 +18,7 @@
         <module>networking</module>
         <module>configmap</module>
         <module>volumes</module>
+        <module>probes</module>
     </modules>
     <packaging>pom</packaging>
 

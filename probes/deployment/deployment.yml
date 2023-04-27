@@ -16,7 +16,13 @@ spec: #spec for the deployment
     spec: #spec for the pod
       containers:
         - name: java-service
-          image: javaguildkubernetes/java-service:pod
+          image: javaguildkubernetes/java-service:probes
           imagePullPolicy: Always
           ports:
-            - containerPort: 80
+            - containerPort: 8080
+          livenessProbe:
+            httpGet:
+              path: /actuator/health
+              port: 8080
+            initialDelaySeconds: 15
+            periodSeconds: 3

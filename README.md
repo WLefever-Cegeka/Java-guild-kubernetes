@@ -13,6 +13,17 @@ Following programs are necessary/handy when following this tutorial:
 During the tutorial we will go over the main components of Kubernetes and demonstrate them by developing a java
 application.
 
+> **Note**: If you want to create your own docker images, then you'll need to add the following lines to your settings.xml
+```xml
+  <servers>
+    <server>
+        <id>registry.hub.docker.com</id>
+        <username>USERNAME</username>
+        <password>PASSWORD</password>
+    </server>
+  </servers>
+```
+
 ## Tutorial
 
 ### Step 1: Pod
@@ -42,4 +53,12 @@ kubectl config current-context
 Apply the deployment file:
 ```bash
 kubectl apply -f ./pod/deployment/deployment.yml
+```
+
+If wanted, you can now change the number of replicas (which would create additional pods).
+
+Once you are done, you can delete the deployment:
+
+```bash
+kubectl delete -f ./pod/deployment/deployment.yml
 ```

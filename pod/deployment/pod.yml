@@ -1,0 +1,13 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: java-service-pod
+  labels:
+    app: java-service
+spec: #spec for the pod
+  containers:
+    - name: java-service
+      image: javaguildkubernetes/java-service:pod
+      imagePullPolicy: Always
+      ports:
+        - containerPort: 80
