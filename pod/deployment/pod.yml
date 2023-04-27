@@ -4,10 +4,10 @@ metadata:
   name: java-service-pod
   labels:
     app: java-service
-spec: #spec for the pod
+spec:
   containers:
     - name: java-service
       image: javaguildkubernetes/java-service:pod
       imagePullPolicy: Always
       ports:
-        - containerPort: 80
+        - containerPort: 8080
